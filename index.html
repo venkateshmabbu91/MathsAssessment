@@ -1,0 +1,137 @@
+<html>
+    <head>
+    <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+    </head>
+
+    <body>
+        <center>
+            <div id="mainScreen">
+                <h1> Welcome to Maths Assessment </h1>
+                <p> Test your math skills today with our simple test</p>
+
+                <div id="introScreen">
+                    <h2> Instructions </h2>
+                    <ul> We will present you a total of 10 questions</ul>
+                    <ul>You have 10 seconds to answer each question </ul>
+                    <ul>Answer will be submitted automatically after 10 seconds </ul>
+                    <ul>You need to score at least 7 to pass this test </ul>
+                    <ul>Once test started, you cannot pause it </ul>
+                    <ul> <b>Note: </b>Calculators/any online resources are strictly prohibited </ul>
+
+                    <input name="fullname" id="fullname" placeholder="Enter your full name"/>
+                    <button id="startTest"> Start Assessment</button>
+                </div>
+            </div>
+                
+            <div id="question_block">
+                <div id="question"> 
+                    This is a sample question
+                </div>
+                <input type="text" id="answer"> 
+                <br>(Your answer will be auto submitted after time expires)
+                <div id="qno"> </div>
+                <input type="hidden" id="rightanswer">
+                <input type="hidden" id="score" value="0">
+                
+                <div id="stopWatch" ></div>
+            </div>
+
+        </center>
+
+    </body>
+    
+    <script>
+        $(document).ready(function(){
+                $("#question_block").hide();
+        });
+
+        var i = 10;
+        var n=1;
+        $("#startTest").click(function (e) {
+
+            $("#introScreen").hide();
+            $("#question_block").show();
+            showQuestion();
+            var t1 = setInterval(function () {
+                
+                $("#qno").html("Question " + n + " out of 10");
+                if(i<4) {
+                    $("#stopWatch").html("<p style='color:red'>" + i + "</p>");
+                } else {
+                    $("#stopWatch").html("<p>" + i + "</p>");
+                }
+
+                i--;
+                //counts for 10, we will submit answer and show a new question and reset the timer
+                if(i < 0) { 
+                    i = 10;
+                    submitAnswer();
+                    showQuestion();
+                    n++;
+                }
+                //If question count is 10, we will end the assessment
+                if(n==10) {
+                    endTest();
+                    clearInterval(t1);
+                }
+
+            }, 1000);
+        });
+
+        function endTest() {
+
+            var score = parseInt($("#score").val());
+            $("#question_block").hide();
+
+            var fullname = $("#fullname").val();
+            if(score > 6) {
+                $("#introScreen").html("<h2>Congrats " +fullname+ "!!! You have passed the test with score "+score+"/10 </h2>");
+            }else {
+                $("#introScreen").html("<h2>Sorry " +fullname+ " You have failed the assessment :( your score is "+score+"/10 </h2>");
+            }
+            $("#introScreen").show();
+        }
+
+        function showQuestion() {
+            //We randomly pick a question tyoe among addition, subtraction or multplication
+            var questionType = getQuestionType();
+            var min = 0, max = 0, operator="";
+            //Min and Max value changes according to the question type
+            switch(questionType) {
+                case 1: min = -100; max = 100; operator = "+"; break;
+                case 2: min = -100; max = 100; operator = "-"; break;
+                case 3: min = 0; max = 50; operator = "*"; break;
+            }
+            
+            var number1 = Math.floor(Math.random() * (max - min) + min);
+            var number2 = Math.floor(Math.random() * (max - min) + min);
+
+            switch(questionType) {
+                case 1: answer = number1 + number2; break;
+                case 2: answer = number1 - number2; break;
+                case 3: answer = number1 * number2; break;
+            }
+
+            $("#rightanswer").val(answer);
+            $("#question").html( "What is the result of " + number1.toString() + " "+operator+" " + number2.toString() );
+        }
+
+        function getQuestionType() {
+            return Math.floor((Math.random() * 3) + 1);
+        }
+
+        function submitAnswer() {
+            var answer = parseInt($("#answer").val());
+            var rightanswer = parseInt($("#rightanswer").val());
+            if(answer == rightanswer) {
+                alert("Right answer");
+                var score = parseInt($("#score").val());
+                score++;
+                $("#score").val(score.toString());
+            } else {
+                alert("Wrong answer, right answer is " + rightanswer);
+            }
+            $("#answer").val("");
+        }
+    </script>
+</html>
